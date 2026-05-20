@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+*.exe
+*.tgz
+*.tar
+*.tar.gz
+*.log
+nps
+npc
+nps-*
+npc-*

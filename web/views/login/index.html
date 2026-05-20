@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title langtag="title-login"></title>
+
+    <link href="{{.web_base_url}}/static/css/fontawesome.min.css" rel="stylesheet">
+    <link href="{{.web_base_url}}/static/css/solid.min.css" rel="stylesheet">
+    <link href="{{.web_base_url}}/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{.web_base_url}}/static/css/toastr.min.css" rel="stylesheet">
+
+    <script src="{{.web_base_url}}/static/js/jquery-3.4.1.min.js"></script>
+    <script src="{{.web_base_url}}/static/js/bootstrap.min.js"></script>
+    <script src="{{.web_base_url}}/static/js/toastr.min.js"></script>
+    <script src="{{.web_base_url}}/static/js/language.js?v=202512054" type="text/javascript"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            color: #fff;
+            font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            background: #031323;
+        }
+
+        .login-stage {
+            position: relative;
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 18px;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .language-switch {
+            position: fixed;
+            top: 24px;
+            right: 28px;
+            z-index: 20;
+        }
+
+        .language-switch .btn {
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .language-switch .dropdown-menu {
+            border: 0;
+            border-radius: 8px;
+            background: rgba(9, 22, 38, 0.92);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-box {
+            position: relative;
+            width: min(100%, 430px);
+        }
+
+        .square {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.12);
+            animation: floatSquare 10s linear infinite;
+            animation-delay: calc(-1s * var(--i));
+        }
+
+        @keyframes floatSquare {
+            0%,
+            100% {
+                transform: translateY(-20px);
+            }
+
+            50% {
+                transform: translateY(20px);
+            }
+        }
+
+        .square:nth-child(1) {
+            top: -28px;
+            right: -42px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .square:nth-child(2) {
+            top: 112px;
+            left: -96px;
+            z-index: 2;
+            width: 140px;
+            height: 140px;
+        }
+
+        .square:nth-child(3) {
+            right: -34px;
+            bottom: 90px;
+            z-index: 2;
+            width: 62px;
+            height: 62px;
+        }
+
+        .square:nth-child(4) {
+            bottom: 34px;
+            left: -58px;
+            width: 52px;
+            height: 52px;
+        }
+
+        .square:nth-child(5) {
+            top: -18px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+        }
+
+        .square:nth-child(6) {
+            top: 210px;
+            right: -118px;
+            z-index: 2;
+            width: 86px;
+            height: 86px;
+        }
+
+        .glass-card {
+            position: relative;
+            width: 100%;
+            min-height: 430px;
+            padding: 46px 44px 34px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.22);
+        }
+
+        .glass-card::after {
+            content: "";
+            position: absolute;
+            inset: 6px;
+            pointer-events: none;
+            border-radius: 6px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04));
+        }
+
+        .login-form {
+            position: relative;
+            z-index: 3;
+        }
+
+        .brand {
+            margin: 0 0 28px;
+            color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .field {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .field input {
+            width: 100%;
+            height: 46px;
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 16px;
+            padding: 8px 42px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .field input:-webkit-autofill,
+        .field input:-webkit-autofill:hover,
+        .field input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff;
+            transition: background-color 9999s ease-in-out 0s;
+            caret-color: #fff;
+        }
+
+        .field span {
+            position: absolute;
+            top: 0;
+            left: 30px;
+            display: inline-block;
+            padding: 11px 10px;
+            color: #fff;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .field input:focus ~ span,
+        .field input:valid ~ span {
+            transform: translateX(-30px) translateY(-27px);
+            font-size: 12px;
+        }
+
+        .field .fas {
+            position: absolute;
+            top: 15px;
+            left: 14px;
+            width: 20px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 0;
+            right: 6px;
+            width: 42px;
+            height: 46px;
+            border: 0;
+            outline: none;
+            color: rgba(255, 255, 255, 0.9);
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .captcha-wrap {
+            margin-bottom: 22px;
+        }
+
+        .captcha-wrap img {
+            max-width: 100%;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-actions {
+            margin-top: 6px;
+        }
+
+        .login-button {
+            min-width: 112px;
+            height: 42px;
+            border: 0;
+            border-radius: 15px;
+            background: #fff;
+            color: #111;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.35s;
+        }
+
+        .login-button:hover,
+        .login-button:focus {
+            color: #fff;
+            background: linear-gradient(115deg, rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.28));
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+        }
+
+        .register-line {
+            margin: 20px 0 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 14px;
+        }
+
+        .register-line a,
+        .login-footer a {
+            color: #fff;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .login-footer {
+            position: fixed;
+            right: 24px;
+            bottom: 18px;
+            left: 24px;
+            display: flex;
+            z-index: 5;
+            justify-content: space-between;
+            gap: 16px;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                overflow: auto;
+            }
+
+            .login-stage {
+                align-items: flex-start;
+                padding-top: 92px;
+                padding-bottom: 88px;
+            }
+
+            .language-switch {
+                top: 18px;
+                right: 18px;
+            }
+
+            .glass-card {
+                min-height: 0;
+                padding: 38px 26px 30px;
+            }
+
+            .brand {
+                font-size: 24px;
+            }
+
+            .square {
+                display: none;
+            }
+
+            .login-footer {
+                position: absolute;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="login-stage">
+        <div class="language-switch btn-group dropdown">
+            <button id="languagemenu" class="btn dropdown-toggle" type="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-globe-asia fa-lg"></i><span></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right"></ul>
+        </div>
+
+        <div class="login-box">
+            <div class="square" style="--i:0;"></div>
+            <div class="square" style="--i:1;"></div>
+            <div class="square" style="--i:2;"></div>
+            <div class="square" style="--i:3;"></div>
+            <div class="square" style="--i:4;"></div>
+            <div class="square" style="--i:5;"></div>
+
+            <div class="glass-card">
+                <form class="login-form" onsubmit="return login()">
+                    <h1 class="brand" langtag="application"></h1>
+
+                    <div class="field">
+                        <input name="username" type="text" required autocomplete="username">
+                        <span langtag="word-username"></span>
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+
+                    <div class="field">
+                        <input id="password-input" name="password" type="password" required autocomplete="current-password">
+                        <span langtag="word-password"></span>
+                        <i class="fas fa-key"></i>
+                        <button class="password-toggle" type="button" onclick="togglePassword()">
+                            <i id="password-eye" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+                    {{if eq true .captcha_open}}
+                    <div class="captcha-wrap">
+                        {{create_captcha}}
+                        <div class="field">
+                            <input name="captcha" type="text" required autocomplete="off">
+                            <span langtag="word-captcha"></span>
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    {{end}}
+
+                    <div class="login-actions">
+                        <button class="login-button" type="submit" langtag="word-login"></button>
+                    </div>
+
+                    {{if eq true .register_allow}}
+                    <p class="register-line">
+                        <span langtag="info-noaccount"></span>
+                        <a href="{{.web_base_url}}/login/register" langtag="word-register"></a>
+                    </p>
+                    {{end}}
+                </form>
+            </div>
+        </div>
+
+        <footer class="login-footer">
+            <div><strong langtag="word-copyright"></strong> <span langtag="application"></span> &copy; 2026</div>
+            <div><span langtag="word-readmore"></span> <strong><a href="https://ehang.io/nps" langtag="word-go"></a></strong></div>
+        </footer>
+    </section>
+
+    <script type="text/javascript">
+        window.nps = {"web_base_url": {{.web_base_url}} }
+
+        function togglePassword() {
+            var input = document.getElementById("password-input");
+            var icon = document.getElementById("password-eye");
+            if (input.getAttribute("type") === "password") {
+                input.setAttribute("type", "text");
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.setAttribute("type", "password");
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        function login() {
+            $.ajax({
+                type: "POST",
+                url: "{{.web_base_url}}/login/verify",
+                data: $(".login-form").serializeArray(),
+                success: function (res) {
+                    if (res.status) {
+                        window.location.href = "{{.web_base_url}}/index/index"
+                    } else if (window.toastr) {
+                        toastr.error(res.msg)
+                    } else {
+                        alert(res.msg)
+                    }
+                },
+                error: function () {
+                    if (window.toastr) {
+                        toastr.error("login request failed")
+                    } else {
+                        alert("login request failed")
+                    }
+                }
+            })
+            return false
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+.idea
+nps
+*.exe
+*.tgz
+*.tar
+*.tar.gz
+*.log
+npc
+nps-*
+npc-*
